@@ -35,8 +35,7 @@ login_data = {'username': config_login['ecampus']['username'],
 with requests.Session() as session:
     post = session.post(login_url, data=login_data)
 
-# check if login was successful
-if 'Cookie authchallenge' not in str(session.cookies):
+if 'Cookie authchallenge' not in str(session.cookies): # check if login was successful
     logger.error(("""Login failed for url: "{link}"
                                   Check your login specification""").format(link=login_url))
     exit()
@@ -44,9 +43,10 @@ if 'Cookie authchallenge' not in str(session.cookies):
 
 def save_file_from_url(url, file_path):
     """ Download url's content, and save it into the specified directory """
-    if 'https' not in url:
+    if 'https' not in url:  # check url is valid
         logger.warning('Not a valid link: {link}'.format(link=url))
     else:
+        # create directory if not already there
         if file_path:
             if not os.path.exists(file_path):
                 os.makedirs(file_path)
@@ -54,9 +54,10 @@ def save_file_from_url(url, file_path):
         response_pdf = session.get(url)
         content_disposition = response_pdf.headers.get('content-disposition')
         if content_disposition:
-            file_names = re.findall('filename="(.+)"', content_disposition)
+            file_names = re.findall('filename="(.+)"', content_disposition)  # get file names from response content
             for file in file_names:
                 if not os.path.exists(file_path + '/' + file):
+                    # save file in the respective folder
                     with open(file_path + '/' + file, 'wb') as pdf_file:
                         logger.info('Save file "{file}" to {directory}'.format(file=file,
                                                                                directory=file_path))
@@ -65,21 +66,24 @@ def save_file_from_url(url, file_path):
 
 
 def recursive_ecampus_scraping(url, directory=[]):
-    """ Walk recursively through each folder-element from the overview, and extract its embedded links to the files """
+    """ Walk recursively through each folder-element from the overview, and extract its embedded links to the files
+    url: url as string
+    """
     response = session.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    a_s = soup.select('h4 > a')
+    soup = BeautifulSoup(response.text, 'html.parser')  # parse html
+    a_s = soup.select('h4 > a')  # selects all elements "a" which are directly within an element "h4"
     for a in a_s:
         a_attributes = a.attrs
-        if 'target' in a_attributes:
-            if 'top' in a_attributes['target']:
-                temp_direc = '/'.join(directory).strip()
+        if 'target' in a_attributes:  # indicates that html-element is a button for either folder or file
+            if 'top' in a_attributes['target']:  # indicates that it is a folder
+                temp_direc = '/'.join(directory).strip()  # current directory as string
                 logger.info('Go into folder {folder}: {link}'.format(folder='/'.join(directory + [a.getText()]).strip(),
                                                                      link=url))
-                save_file_from_url(a.get('href'), temp_direc)
+                save_file_from_url(a.get('href'), temp_direc)  # creates directory
+                # start recursion with the folder-element's link and the updated directory
                 recursive_ecampus_scraping(a.get('href'), directory + [a.getText()])
 
-            elif 'blank' in a_attributes['target']:
+            elif 'blank' in a_attributes['target']: # indicates that it is a file
                 temp_direc = '/'.join(directory).strip()
                 file_name = a.getText().strip()
                 logger.info('Download "{file}" from {folder}: {link}'.format(file=file_name,
