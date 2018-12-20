@@ -17,7 +17,7 @@ and password: <p align="center"><img src="https://i.imgur.com/IEiHJTa.png"></p>
 - **Execution**: Just run script "ecampus_overview_scraping.py" 
 
 
-### Example
+## Process Illustration 
 Assume that below is your overview as specified in the file "links.ini": <p align="center"><img src="https://i.imgur.com/LT4KJ5I.png"></p>
 
 1. Go into the finance folder: <p align="center"><img src="https://i.imgur.com/MXeSq8K.png"></p> 
