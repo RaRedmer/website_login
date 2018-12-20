@@ -66,9 +66,7 @@ def save_file_from_url(url, file_path):
 
 
 def recursive_ecampus_scraping(url, directory=[]):
-    """ Walk recursively through each folder-element from the overview, and extract its embedded links to the files
-    url: url as string
-    """
+    """ Walk recursively through each folder-element from the overview, and extract its embedded links to the files"""
     response = session.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')  # parse html
     a_s = soup.select('h4 > a')  # selects all elements "a" which are directly within an element "h4"
