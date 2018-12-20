@@ -24,8 +24,8 @@ Assume that below is your overview as specified in the file "links.ini": <p alig
  
 2. Download all files from it: <p align="center"><img src="https://i.imgur.com/lrK60DZ.png"></p>
 
-3. go back into the previous directory "Finance" and start to check folder "Papers" 
+3. Go back into the previous directory "Finance" and start to check folder "Papers" 
 for more files and folders
 
-4. repeat until all files got downloaded and start the process all over again 
+4. Repeat until all files got downloaded and start the process all over again 
 for the next course "Mathematics" from the overview
