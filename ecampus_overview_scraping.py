@@ -36,9 +36,9 @@ with requests.Session() as session:
     post = session.post(login_url, data=login_data)
 
 if 'Cookie authchallenge' not in str(session.cookies): # check if login was successful
-    logger.error(("""Login failed for url: "{link}"
-                                  Check your login specification""").format(link=login_url))
-    exit()
+    logger.error(("""Login failed for url: "{link}" """).format(link=login_url))
+    logger.error("Check your login-specification")
+    sys.exit()
 
 
 def save_file_from_url(url, file_path):
@@ -81,7 +81,7 @@ def recursive_ecampus_scraping(url, directory=[]):
                 # start recursion with the folder-element's link and the updated directory
                 recursive_ecampus_scraping(a.get('href'), directory + [a.getText()])
 
-            elif 'blank' in a_attributes['target']: # indicates that it is a file
+            elif 'blank' in a_attributes['target']:  # indicates that it is a file
                 temp_direc = '/'.join(directory).strip()
                 file_name = a.getText().strip()
                 logger.info('Download "{file}" from {folder}: {link}'.format(file=file_name,
