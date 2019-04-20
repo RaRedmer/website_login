@@ -1,6 +1,5 @@
 # coding: utf-8
 
-
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -9,36 +8,22 @@ import sys
 import os
 import configparser
 
-# logging configuration
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-fhandler = logging.StreamHandler(sys.stdout)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-fhandler.setFormatter(formatter)
-logger.addHandler(fhandler)
 
-# load config
-config_login = configparser.ConfigParser()
-config_login.read('config/login_data.ini')
+def init_logging():
+    """  Initiate logging and configure
+     Returns:
+         logger(class): Fully formatted and configured logging-class
+     """
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    fhandler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    fhandler.setFormatter(formatter)
+    if logger.hasHandlers():
+        logger.handlers.clear()
 
-config_urls = configparser.ConfigParser()
-config_urls.read('config/links.ini')
-
-# Ecampus login
-base_url = config_urls['ecampus']['base_url']
-action = config_urls['ecampus']['action']
-login_url = base_url + action
-
-login_data = {'username': config_login['ecampus']['username'],
-              'password': config_login['ecampus']['password']}
-
-with requests.Session() as session:
-    post = session.post(login_url, data=login_data)
-
-if 'Cookie authchallenge' not in str(session.cookies): # check if login was successful
-    logger.error(("""Login failed for url: "{link}" """).format(link=login_url))
-    logger.error("Check your login-specification")
-    sys.exit()
+    logger.addHandler(fhandler)
+    return logger
 
 
 def save_file_from_url(url, file_path):
@@ -90,4 +75,31 @@ def recursive_ecampus_scraping(url, directory=[]):
                 save_file_from_url(a.get('href'), temp_direc)
 
 
-recursive_ecampus_scraping(config_urls['ecampus']['overview_url'])
+if __name__ == "__main__":
+    # logging configuration
+    logger = init_logging()
+
+    # load config
+    config_login = configparser.ConfigParser()
+    config_login.read('config/login_data.ini')
+
+    config_urls = configparser.ConfigParser()
+    config_urls.read('config/links.ini')
+
+    # Ecampus login
+    base_url = config_urls['ecampus']['base_url']
+    action = config_urls['ecampus']['action']
+    login_url = base_url + action
+
+    login_data = {'username': config_login['ecampus']['username'],
+                  'password': config_login['ecampus']['password']}
+
+    with requests.Session() as session:
+        post = session.post(login_url, data=login_data)
+
+    if 'Cookie authchallenge' not in str(session.cookies):  # check if login was successful
+        logger.error(("""Login failed for url: "{link}" """).format(link=login_url))
+        logger.error("Check your login-specification")
+        sys.exit()
+
+    recursive_ecampus_scraping(config_urls['ecampus']['overview_url'])
