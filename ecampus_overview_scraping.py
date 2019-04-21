@@ -29,7 +29,7 @@ def init_logging():
 def save_file_from_url(url, file_path):
     """ Download url's content, and save it into the specified directory """
     if 'https' not in url:  # check url is valid
-        logger.warning('Not a valid link: {link}'.format(link=url))
+        logger.warning(f'Not a valid link: {url}')
     else:
         # create directory if not already there
         if file_path:
@@ -44,10 +44,8 @@ def save_file_from_url(url, file_path):
                 if not os.path.exists(file_path + '/' + file):
                     # save file in the respective folder
                     with open(file_path + '/' + file, 'wb') as pdf_file:
-                        logger.info('Save file "{file}" to {directory}'.format(file=file,
-                                                                               directory=file_path))
+                        logger.info(f'Save file "{file}" to {file_path}')
                         pdf_file.write(response_pdf.content)
-                        pdf_file.close()
 
 
 def recursive_ecampus_scraping(url, directory=[]):
@@ -60,8 +58,7 @@ def recursive_ecampus_scraping(url, directory=[]):
         if 'target' in a_attributes:  # indicates that html-element is a button for either folder or file
             if 'top' in a_attributes['target']:  # indicates that it is a folder
                 temp_direc = '/'.join(directory).strip()  # current directory as string
-                logger.info('Go into folder {folder}: {link}'.format(folder='/'.join(directory + [a.getText()]).strip(),
-                                                                     link=url))
+                logger.info('Go into folder {folder}: {link}'.format(folder='/'.join(directory + [a.getText()]).strip(), link=url))
                 save_file_from_url(a.get('href'), temp_direc)  # creates directory
                 # start recursion with the folder-element's link and the updated directory
                 recursive_ecampus_scraping(a.get('href'), directory + [a.getText()])
@@ -69,9 +66,7 @@ def recursive_ecampus_scraping(url, directory=[]):
             elif 'blank' in a_attributes['target']:  # indicates that it is a file
                 temp_direc = '/'.join(directory).strip()
                 file_name = a.getText().strip()
-                logger.info('Download "{file}" from {folder}: {link}'.format(file=file_name,
-                                                                             folder=temp_direc,
-                                                                             link=a.get('href')))
+                logger.info('Download "{file}" from {folder}: {link}'.format(file=file_name, folder=temp_direc, link=a.get('href')))
                 save_file_from_url(a.get('href'), temp_direc)
 
 
